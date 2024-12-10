@@ -2,15 +2,15 @@ name: Publish Docker image
 
 on:
   push:
-    
+    branches:
+      - main  # ou la branche sur laquelle vous souhaitez déclencher le workflow
 
 jobs:
   build_and_test:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.9" ]
+        python-version: [ "3.9" ]  # Version de Python à utiliser pour les tests
 
     steps:
       - uses: actions/checkout@v3
@@ -25,14 +25,11 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Lint with flake8
         run: |
-          # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
           pytest
-  
 
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -52,7 +49,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: abdabdochtouki/calculator:tagname
+          images: abdabdochtouki/calculator:${{ github.sha }}  # Utilisation de SHA du commit pour générer un tag unique
       
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -60,9 +57,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: abdabdochtouki/calculator:${{ steps.meta.outputs.tags }}  # Utilisation du tag dynamique basé sur le SHA du commit
           labels: ${{ steps.meta.outputs.labels }}
-
-
-
-  
