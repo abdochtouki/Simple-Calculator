@@ -18,3 +18,4 @@ if __name__ == "__main__":
     print("The sum of {} and {} is: {}".format(num1, num2, add_result))
     print("The sum of {} and {} is: {}".format(num1, num2, sub_result))
     print("END CI/CD :)")
+    print("abdo chtouki")
